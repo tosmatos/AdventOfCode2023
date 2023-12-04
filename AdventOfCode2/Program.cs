@@ -1,6 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-
-string[] inputLines = File.ReadAllLines("input.txt");
+﻿string[] inputLines = File.ReadAllLines("input.txt");
 
 int idSum = 0;
 int part2Sum = 0;
