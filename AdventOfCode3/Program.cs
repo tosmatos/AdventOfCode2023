@@ -102,7 +102,9 @@ for (int i = 0; i < numbersWithAdjacentStars.Count; i++)
 }
 
 part2TotalSum = part2TotalList.Sum();
-Console.WriteLine(Environment.NewLine + "Total : " + totalSum);
+
+Console.WriteLine(Environment.NewLine + "Total partie 1 : " + totalSum);
+Console.WriteLine("Total partie 2 : " + part2TotalSum);
 
 List<char> getAdjacent(List<char[]> array, int i, int j)
 {
