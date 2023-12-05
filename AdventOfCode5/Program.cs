@@ -1,14 +1,14 @@
 ﻿string[] input = File.ReadAllLines("input.txt");
 
-uint[] seeds = Array.ConvertAll(input[0].Split('\n')[0].Split(':')[1].Trim().Split(' '), UInt32.Parse);
+long[] seeds = Array.ConvertAll(input[0].Split('\n')[0].Split(':')[1].Trim().Split(' '), Int64.Parse);
 
-List<List<(uint DestinationRange, uint SourceRange, uint RangeLength)>> maps = new();
+List<List<(long DestinationRange, long SourceRange, long RangeLength)>> maps = new();
 
 bool gettingMap = false;
 
-List<List<(uint, uint)>> correspondanceTables = new();
+List<List<(long, long)>> correspondanceTables = new();
 
-List<(uint, uint, uint)> currentMap = new();
+List<(long, long, long)> currentMap = new();
 
 // put all maps in maps List
 for (int i = 1; i < input.Length; i++)
@@ -29,45 +29,31 @@ for (int i = 1; i < input.Length; i++)
 		}
 		else
 		{
-			uint[] mapLine = Array.ConvertAll(input[i].Split(' '), UInt32.Parse);
+			long[] mapLine = Array.ConvertAll(input[i].Split(' '), Int64.Parse);
 			currentMap.Add((mapLine[0], mapLine[1], mapLine[2]));
 		}
 	}
 }
-
 if (gettingMap) maps.Add(currentMap);// ça veut dire qu'on choppais une ligne mais que la boucle à fini
 
-// Populate correspondance list
-foreach (List<(uint, uint, uint)> map in maps)
-{
-	List<(uint, uint)> currentCorrespondance = new();
+List<long> locationList = new();
 
-	foreach ((uint DestinationRange, uint SourceRange, uint RangeLength) mapLine in map)
+long searchedNumber = 0;
+foreach (long seed in seeds)
+{
+	searchedNumber = seed;
+	foreach (List<(long DestinationRange, long SourceRange, long RangeLength)> map in maps)
 	{
-		for (uint i = 0; i < mapLine.RangeLength; i++)
+		foreach ((long DestinationRange, long SourceRange, long RangeLength) mapLine in map)
 		{
-			currentCorrespondance.Add((mapLine.SourceRange + i, mapLine.DestinationRange + i));
+			if (mapLine.SourceRange <= searchedNumber && searchedNumber < mapLine.SourceRange + mapLine.RangeLength)
+			{
+				searchedNumber = searchedNumber + (mapLine.DestinationRange - mapLine.SourceRange);
+				break;
+			}
 		}
 	}
-	correspondanceTables.Add(currentCorrespondance);
-}
-
-List<int> locationList = new();
-
-uint searchedNumber = 0;
-foreach (int seed in seeds)
-{
-	searchedNumber = (uint)seed;
-	foreach (var correspondanceTable in correspondanceTables)
-	{
-		(uint, uint) foundCorrespondance = correspondanceTable.Find(x => x.Item1 == searchedNumber);
-		if (foundCorrespondance != (0, 0)) // ça veut dire pas de correspondance trouvée
-		{
-			searchedNumber = foundCorrespondance.Item2;
-		}
-	}
-
-	locationList.Add((int)searchedNumber);
+	locationList.Add(searchedNumber);
 }
 
 Console.WriteLine($"Smallest location : {locationList.Min()}");
