@@ -51,10 +51,9 @@ for (int i = 1; i < input.Length; i++)
 }
 if (gettingMap) maps.Add(currentMap);// ça veut dire qu'on choppais une ligne mais que la boucle à fini
 
-List<long> locationList = new();
-
+long smallestLocation = 9223372036854775807; // max long value
 long searchedNumber = 0;
-foreach (long seed in seeds)
+foreach (long seed in part2Seeds) // Replace List to get part 1 or 2
 {
 	searchedNumber = seed;
 	foreach (List<(long DestinationRange, long SourceRange, long RangeLength)> map in maps)
@@ -68,7 +67,7 @@ foreach (long seed in seeds)
 			}
 		}
 	}
-	locationList.Add(searchedNumber);
+	if (searchedNumber < smallestLocation) smallestLocation = searchedNumber;
 }
 
-Console.WriteLine($"Smallest location : {locationList.Min()}");
+Console.WriteLine($"Smallest location : {smallestLocation}");
