@@ -2,6 +2,21 @@
 
 long[] seeds = Array.ConvertAll(input[0].Split('\n')[0].Split(':')[1].Trim().Split(' '), Int64.Parse);
 
+List<long> part2Seeds = new();
+
+for (int i = 0;  i < seeds.Length; i++)
+{
+	if (i % 2 == 0)
+	{
+		long seedToCopy = seeds[i];
+		part2Seeds.Add(seedToCopy);
+		for (int j = 1; j < seeds[i + 1]; j++)
+		{
+			part2Seeds.Add(seedToCopy + j);
+		}
+	}
+}
+
 List<List<(long DestinationRange, long SourceRange, long RangeLength)>> maps = new();
 
 bool gettingMap = false;
