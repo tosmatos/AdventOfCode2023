@@ -10,7 +10,7 @@ for (int i = 0; i < times.Count; i++) timeDistances.Add((Convert.ToInt32(times[i
 long part2Time = Convert.ToInt64(times.Aggregate("", (a, b) => a + b));
 long part2Distance = Convert.ToInt64(distances.Aggregate("", (a, b) => a + b));
 
-List<int> numberWaysToWinAcrossRaces = GetNumberWaysToWinPart1();
+zList<int> numberWaysToWinAcrossRaces = GetNumberWaysToWinPart1();
 
 int numberWaysToWinPart2 = 0;
 for (int i = 0; i < part2Time; i++)
