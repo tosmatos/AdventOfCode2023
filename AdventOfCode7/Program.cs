@@ -1,11 +1,8 @@
 ﻿string[] input = File.ReadAllLines("input.txt");
 
-List<Hand> orderedHands = new List<Hand>();
+int totalPart1 = 0;
 
-char[] strengthOrder = new char[]
-{
-	'2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K', 'A'
-};
+List<Hand> orderedHands = new List<Hand>();
 
 Dictionary<HandType, List<Hand>> handsGroups = new()
 {
@@ -61,68 +58,44 @@ foreach (string play in input)
 
 foreach (var handGroup in handsGroups)
 {
-	List<Hand> orderedHandGroup = new();
-	CustomHandSort(handGroup.Value);
-	Console.WriteLine("Sorted group" + handGroup.Key);
-	for (int i = 0; i < handGroup.Value.Count; i++)
+	List<Hand> sortedHandGroup = handGroup.Value.OrderBy(hand => hand, new HandComparer()).ToList();
+	orderedHands.AddRange(sortedHandGroup);
+}
+
+for (int i= 0; i < orderedHands.Count; i++)
+{
+	totalPart1 += orderedHands[i].bid * (i + 1);
+}
+
+Console.WriteLine("Total part 1 " + totalPart1);
+
+public class HandComparer : IComparer<Hand>
+{
+	char[] strengthOrder = new char[]
 	{
-		Hand hand = handGroup.Value[i];
-		Console.WriteLine(hand.hand);
+		'2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K', 'A'
+	};
+	public int Compare(Hand x, Hand y)
+	{
+		return CompareHands(x.hand, y.hand);
+	}
+
+	private int CompareHands(string hand1, string hand2)
+	{
+		// For longueur de la main, comme ça si on trouve pas -1 ou +1 on regarde la carte suivante
+		for (int i = 0; i < Math.Min(hand1.Length, hand2.Length); i++)
+		{
+			int index1 = Array.IndexOf(strengthOrder, hand1[i]);
+			int index2 = Array.IndexOf(strengthOrder, hand2[i]);
+
+			if (index1 < index2) return -1;
+			else if (index1 > index2) return 1;
+        }
+		// On arrive ici que si la main est exactement pareille
+		return 0;
 	}
 }
 
-Console.WriteLine("coucou");
-
-void CustomHandSort(List<Hand> handList)
-{
-	bool itemMoved = false;
-	do
-	{
-		itemMoved = false;
-		for (int i = 0; i < handList.Count - 1; i++)
-		{
-			var hand = handList[i].hand;
-			var nextHand = handList[i + 1].hand;
-			if (Array.IndexOf(strengthOrder, hand[0]) < Array.IndexOf(strengthOrder, nextHand[0]))
-			{
-				var lowerValue = handList[i];
-				handList[i] = handList[i + 1];
-				handList[i + 1] = lowerValue;
-				itemMoved = true;
-			}
-			else if (Array.IndexOf(strengthOrder, hand[1]) < Array.IndexOf(strengthOrder, nextHand[1]))
-			{
-				var lowerValue = handList[i];
-				handList[i] = handList[i + 1];
-				handList[i + 1] = lowerValue;
-				itemMoved = true;
-			}
-			else if (Array.IndexOf(strengthOrder, hand[2]) < Array.IndexOf(strengthOrder, nextHand[2]))
-			{
-				var lowerValue = handList[i];
-				handList[i] = handList[i + 1];
-				handList[i + 1] = lowerValue;
-				itemMoved = true;
-			}
-			else if (Array.IndexOf(strengthOrder, hand[3]) < Array.IndexOf(strengthOrder, nextHand[3]))
-			{
-				var lowerValue = handList[i];
-				handList[i] = handList[i + 1];
-				handList[i + 1] = lowerValue;
-				itemMoved = true;
-			}
-			else if (Array.IndexOf(strengthOrder, hand[4]) < Array.IndexOf(strengthOrder, nextHand[4]))
-			{
-				var lowerValue = handList[i];
-				handList[i] = handList[i + 1];
-				handList[i + 1] = lowerValue;
-				itemMoved = true;
-			}
-		}
-	} while (itemMoved);
-}
-
-Console.WriteLine("coucou");
 public enum HandType
 {
 	None,
