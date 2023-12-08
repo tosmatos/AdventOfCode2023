@@ -3,7 +3,6 @@
 char[] directions = input[0].ToCharArray();
 
 int steps = 0;
-ulong stepsPart2 = 0;
 
 bool foundZZZ = false;
 
@@ -48,42 +47,68 @@ while (!foundZZZ) //  while for part 1
 	directionIndex++;
 }
 
-bool foundAllZ = false;
-directionIndex = 0;
+List<int> searchedNodesSteps = new();
 
-while (!foundAllZ) // for part 2
+foreach (string node in searchedNodes)
 {
-	stepsPart2++;
-
-	if (directionIndex == directions.Length)
-		directionIndex = 0;
-
-	char direction = directions[directionIndex];
-	if (searchedNodes[5][2] == 'A')
-		PrintNode(searchedNodes[5]);
-
-	//for (int i = 0; i < searchedNodes.Count; i++)
-	Parallel.For(0, searchedNodes.Count, (i) =>
+	PrintNode(node);
+	bool foundEndZ = false;
+	searchedNode = node;
+	int innerSteps = 0;
+	directionIndex = 0;
+	while (!foundEndZ)
 	{
-		string searchedNode = searchedNodes[i];
+		innerSteps++;
+		if (directionIndex == directions.Length)
+			directionIndex = 0;
+
+		char direction = directions[directionIndex];
 
 		string nextNode = direction == 'L' ? nodes[searchedNode].Left : nodes[searchedNode].Right;
-		searchedNodes[i] = nextNode;
-	});
 
-	if (searchedNodes[5][2] == 'Z')
-		PrintNode(searchedNodes[5]);
-
-	int zCount = searchedNodes.Where(node => node[2] == 'Z').Count();
-	if (zCount == searchedNodes.Count)
-		foundAllZ = true;
-	directionIndex++;
+		if (nextNode[2] == 'Z')
+			foundEndZ = true;
+		searchedNode = nextNode;
+		directionIndex++;
+	}
+	searchedNodesSteps.Add(innerSteps);
+	Console.WriteLine($"Found end node in {innerSteps}. End node :");
+	PrintNode(searchedNode);
 }
 
+
+
 Console.WriteLine($"Steps needed to reach ZZZ : {steps}");
-Console.WriteLine($"Steps needed to reach all nodes that end with Z : {stepsPart2}");
+Console.WriteLine($"Steps needed to reach all nodes that end with Z : {CalculateLCMList(searchedNodesSteps)}");
 
 void PrintNode(string node)
 {
 	Console.WriteLine($"{node} : ({nodes[node].Left}, {nodes[node].Right})");
+}
+
+long CalculateGCD(long a, long b)
+{
+	while (b != 0)
+	{
+		long temp = b;
+		b = a % b;
+		a = temp;
+	}
+	return a;
+}
+
+long CalculateLCM(long a, long b)
+{
+	return (a * b) / CalculateGCD(a, b);
+}
+
+long CalculateLCMList(List<int> numbers)
+{
+	long lcm = CalculateLCM(numbers[0], numbers[1]);
+
+	for (int i = 2; i < numbers.Count; i++)
+		// because property LCM(a, b, c) == LCM(LCM(a, b), c)
+		lcm = CalculateLCM(lcm, numbers[i]);
+
+	return lcm;
 }
