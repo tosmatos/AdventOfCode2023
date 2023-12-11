@@ -13,9 +13,9 @@ foreach (string line in input)
 	{
 		for (int i = 0; i < searchedLine.Length - 1; i++)
 		{
-			int max = Math.Max(searchedLine[i], searchedLine[i + 1]);
-			int min = Math.Min(searchedLine[i], searchedLine[i + 1]);
-			newLine.Add(max - min);
+			//int max = Math.Max(searchedLine[i], searchedLine[i + 1]);
+			//int min = Math.Min(searchedLine[i], searchedLine[i + 1]);
+			newLine.Add(searchedLine[i + 1] - searchedLine[i]);
 		}
 		extrapolatedValue += newLine.LastOrDefault();
 		int zeroCount = newLine.Where(number => number == 0).Count();
