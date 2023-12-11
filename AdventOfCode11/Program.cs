@@ -38,6 +38,9 @@ for (int i = 0; i < columnCount; i++)
 		columnIndexes.Add(i);
 }
 
+rowIndexes.Reverse();
+columnIndexes.Reverse();
+
 char[,] newGrid;
 // Insert rows
 foreach (int rowIndex in rowIndexes)
@@ -47,6 +50,7 @@ foreach (int rowIndex in rowIndexes)
 	Array.Copy(newGrid, grid, newGrid.Length);
 }
 
+
 foreach (int columnIndex in columnIndexes)
 {
 	newGrid = InsertColumn(grid, columnIndex);
@@ -54,18 +58,43 @@ foreach (int columnIndex in columnIndexes)
 	Array.Copy(newGrid, grid, newGrid.Length);
 }
 
-List<(int Row, int Column)> galaxies = [];
+List<(int Row, int Column)> galaxiesPositions = [];
 
 for (int i = 0; i < grid.GetLength(0); i++)
 {
 	for (int j = 0; j < grid.GetLength(1); j++)
 	{
 		if (grid[i, j] == '#')
-			galaxies.Add((i, j));
+			galaxiesPositions.Add((i, j));
 	}
 }
 
-Console.WriteLine();
+List<((int Row, int Column), (int Row, int Column))> donePairs = [];
+int distanceSum = 0;
+
+for (int i = 0; i < galaxiesPositions.Count; i++)
+{
+	for (int j = 0; j < galaxiesPositions.Count; j++)
+	{
+		(int Row, int Column) galaxy1 = galaxiesPositions[i], galaxy2 = galaxiesPositions[j];
+
+		if (galaxy1 == galaxy2) continue;
+
+		if (donePairs.Contains((galaxy1, galaxy2)) || donePairs.Contains((galaxy2, galaxy1)))
+			continue; 
+		
+		Console.WriteLine(galaxy1 + ", " + galaxy2);
+		
+		donePairs.Add((galaxy1, galaxy2));
+
+		int distance = Math.Max(galaxy1.Row, galaxy2.Row) - Math.Min(galaxy1.Row, galaxy2.Row)
+			+ Math.Max(galaxy1.Column, galaxy2.Column) - Math.Min(galaxy1.Column, galaxy2.Column);
+
+		distanceSum += distance;
+	}
+}
+
+Console.WriteLine($"Total sum of unioque pairs : {distanceSum}");
 
 char[,] InsertRow(char[,] originalGrid, int rowIndex)
 {
