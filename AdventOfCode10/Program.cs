@@ -1,6 +1,8 @@
 ﻿string[] input = File.ReadAllLines("input.txt");
 
-char[] pipes = new char[6] {'|', '-', 'L', 'J', '7', 'F'};
+char[] pipes = {'|', '-', 'L', 'J', '7', 'F'};
+
+char[] pipesNorth = { '|', 'F', '7', 'S'};
 
 char[,] grid = new char[input.Length, input[0].Length];
 
@@ -18,23 +20,63 @@ for (int i = 0; i < input.Length; i++)
 	}
 }
 
+Console.WindowWidth = grid.GetLength(0) + 1;
+//Console.WindowHeight = grid.GetLength(1) + 1;
+
 List<(int Row, int Column)> starterPipes = GetFirstPipesPositions(startPosition.Row, startPosition.Column);
 bool backToStart = false;
 (int Row, int Column) previousPosition = startPosition, currentPosition = starterPipes[0], nextPosition = (0,0);
 int steps = 1;
 
+List<(int Row, int Column)> pipeLoop = [];
+pipeLoop.Add(startPosition);
+
+Console.ForegroundColor = ConsoleColor.White;
+DisplayGrid();
+
+Console.ForegroundColor = ConsoleColor.Red;
 while (!backToStart)
 {
 	steps++;
-	nextPosition = GetNextDirection(previousPosition.Row, previousPosition.Column, currentPosition.Row, currentPosition.Column);
+	pipeLoop.Add(currentPosition);
+	Console.SetCursorPosition(currentPosition.Column, currentPosition.Row);
+	Console.Write(grid[currentPosition.Row, currentPosition.Column]);
+    nextPosition = GetNextDirection(previousPosition.Row, previousPosition.Column, currentPosition.Row, currentPosition.Column);
 	previousPosition = currentPosition;
 	currentPosition = nextPosition;
 	if (currentPosition == startPosition)
 		backToStart = true;
 }
 
+int tilesInsideLoop = 0;
+
+Console.ForegroundColor = ConsoleColor.Blue;
+
+for (int i = 0; i < grid.GetLength(0); i++) // rows
+{
+    bool counting = false;
+    for (int j = 0; j < grid.GetLength(1); j++) // columns
+	{
+		if (pipeLoop.Contains((i, j)) && pipesNorth.Contains(grid[i,j]))
+		{
+            counting = !counting;
+			continue;
+        }
+		if (counting && !pipeLoop.Contains((i,j)))
+		{
+            Console.SetCursorPosition(j, i);
+            Console.Write(grid[i, j]);
+			Thread.Sleep(100);
+            tilesInsideLoop++;
+		}
+	}
+}
+
+Console.ForegroundColor = ConsoleColor.Green;
+Console.SetCursorPosition(0, grid.GetLength(0));
 Console.WriteLine($"Number of steps to go back to beginning : {steps}");
 Console.WriteLine($"Furthest distance from start : {steps / 2}");
+Console.WriteLine($"Tiles inside the loop : {tilesInsideLoop}");
 
 (int Row, int Column) GetNextDirection(int previousRow, int previousColumn, int currentRow, int currentColumn)
 {
@@ -102,4 +144,17 @@ List<(int Row, int Column)> GetFirstPipesPositions(int row, int column)
 		}
 	}
 	return firstPipes;
+}
+
+void DisplayGrid()
+{
+    for (int row = 0; row < grid.GetLength(0); row++)
+    {
+        for (int column = 0; column < grid.GetLength(1); column++)
+        {
+            Console.SetCursorPosition(column, row);
+            Console.Write(grid[row, column]);
+        }
+        Console.WriteLine();
+    }
 }
