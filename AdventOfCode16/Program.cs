@@ -15,24 +15,82 @@ for (int i = 0; i < input.Length; i++)
         energizedGrid[i, j] = '.';
     }
 }
+
 HashSet<(int Row, int Column, Direction direction)> visitedPositions = new();
 
 TravelInGrid(Direction.Right, 0, 0);
 
-int totalEnergizedTiles = 0;
-
-for (int i = 0; i < input.Length; i++)
-{
-    for (int j = 0; j < input[i].Length; j++)
-    {
-        if (energizedGrid[i, j] == '#')
-            totalEnergizedTiles++;
-    }
-}
+int totalEnergizedTiles = CountEnergizedTiles();
 
 DisplayGrid(energizedGrid);
 
-Console.WriteLine($"Total energized tiles : {totalEnergizedTiles}");
+Console.WriteLine($"Total energized tiles (Part 1): {totalEnergizedTiles}");
+
+ResetEnergizedGrid();
+
+// Part 2
+
+List<int> energizedTiles = [];
+
+// Search top row beaming down
+for (int i = 0; i < grid.GetLength(1) - 1; i++)
+{
+    TravelInGrid(Direction.Down, 0, i);
+    energizedTiles.Add(CountEnergizedTiles());
+    ResetEnergizedGrid();
+}
+
+// Search bottom row beaming up
+for (int i = grid.GetLength(1) - 1; i >= 0; i--)
+{
+	TravelInGrid(Direction.Up, 0, i);
+	energizedTiles.Add(CountEnergizedTiles());
+	ResetEnergizedGrid();
+}
+
+// Search left column beaming right
+for (int i = 0; i < grid.GetLength(0) - 1; i++)
+{
+	TravelInGrid(Direction.Right, i, 0);
+	energizedTiles.Add(CountEnergizedTiles());
+	ResetEnergizedGrid();
+}
+
+// Search right column beaming left
+for (int i = grid.GetLength(0) - 1; i >= 0; i--)
+{
+	TravelInGrid(Direction.Left, 0, i);
+	energizedTiles.Add(CountEnergizedTiles());
+	ResetEnergizedGrid();
+}
+
+Console.WriteLine($"Best total energized tiles (part 2) : {energizedTiles.Max()}");
+
+void ResetEnergizedGrid()
+{
+	for (int i = 0; i < input.Length; i++)
+	{
+		for (int j = 0; j < input[i].Length; j++)
+		{
+			energizedGrid[i, j] = '.';
+		}
+	}
+    visitedPositions = []; // Reset this aswell else every subsequent search if flawed
+}
+
+int CountEnergizedTiles()
+{
+    int energizedTiles = 0;
+	for (int i = 0; i < input.Length; i++)
+	{
+		for (int j = 0; j < input[i].Length; j++)
+		{
+			if (energizedGrid[i, j] == '#')
+				energizedTiles++;
+		}
+	}
+    return energizedTiles;
+}
 
 void TravelInGrid(Direction direction, int row, int column)
 {
